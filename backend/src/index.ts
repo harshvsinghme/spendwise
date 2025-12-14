@@ -9,9 +9,7 @@ app.use(pinoHttp({ logger: logger }));
 
 const PORT = process.env["PORT"] ?? 4000;
 
-app.listen(PORT, async () => {
-  logger.info(`Server is running on port ${PORT}`);
-
+setTimeout(async () => {
   try {
     const { rows } = await pool.query("SELECT * FROM users");
 
@@ -19,4 +17,8 @@ app.listen(PORT, async () => {
   } catch (error) {
     logger.error(error);
   }
+}, 2000);
+
+app.listen(PORT, async () => {
+  logger.info(`Server is running on port ${PORT}`);
 });
