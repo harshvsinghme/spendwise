@@ -1,0 +1,8 @@
+packages:
+  - "backend"
+  - "app"
+# pnpm --filter backend local
+# pnpm --filter backend --filter app local
+# pnpm -r build
+# pnpm -r --filter "./backend" build
+# pnpm --filter backend add -D typescript @types/node
