@@ -15,7 +15,7 @@ app.listen(PORT, async () => {
   try {
     const { rows } = await pool.query("SELECT * FROM users");
 
-    console.log(rows)
+    console.log(rows);
   } catch (error) {
     logger.error(error);
   }
