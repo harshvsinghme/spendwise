@@ -6,6 +6,7 @@
     "backend:local": "pnpm --filter backend local",
     "backend:build": "pnpm --filter backend build",
     "backend:dev": "pnpm --filter backend dev",
-    "backend:format": "pnpm --filter backend format"
+    "backend:format": "pnpm --filter backend format",
+    "backend:lint": "pnpm --filter backend lint"
   }
 }
