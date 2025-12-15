@@ -10,5 +10,8 @@
     "backend:format": "pnpm --filter backend format",
     "backend:lint": "pnpm --filter backend lint",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "husky": "^9.1.7"
   }
 }
