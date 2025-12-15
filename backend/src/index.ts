@@ -7,7 +7,6 @@ const app = express();
 
 app.use(pinoHttp({ logger: logger }));
 
-const PORT = process.env["PORT"] ?? 4000;
 
 setTimeout(async () => {
   try {
@@ -19,6 +18,6 @@ setTimeout(async () => {
   }
 }, 2000);
 
-app.listen(PORT, async () => {
-  logger.info(`Server is running on port ${PORT}`);
+app.listen(process.env["PORT"], async () => {
+  logger.info(`Server is running on port ${process.env["PORT"]}`);
 });
