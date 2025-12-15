@@ -1,5 +1,5 @@
 dist
 node_modules
-*.txt
-.env*
+.env.development
+.env.local
 .DS_Store

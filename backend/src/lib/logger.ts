@@ -1,28 +1,20 @@
-import pino from "pino";
 import dotenv from "dotenv";
-import { Environments } from "../constants/index.js";
 import { existsSync } from "node:fs";
+import pino from "pino";
 
-const path = `${process.cwd()}/.env.${
-  process.env["NODE_ENV"] ?? Environments.LOCAL
-}`;
+const path = `${process.cwd()}/.env.${process.env["NODE_ENV"]}`;
 
 if (!existsSync(path)) {
   console.error(`Environment file not found at path: ${path}`);
-  process.exit(0);
+  process.exit(1);
 }
 
 dotenv.config({
   path,
 });
 
-console.log(
-  `Using environment file: ${path}`,
-  `LOG_LEVEL: ${process.env["LOG_LEVEL"] ?? `info(fallback)`}`
-);
-
 const logger = pino({
-  level: process.env["LOG_LEVEL"] ?? "info",
+  level: process.env["LOG_LEVEL"]!,
   transport: {
     target: "pino-pretty",
     options: {
@@ -32,5 +24,8 @@ const logger = pino({
     },
   },
 });
+
+logger.info(`Environment loaded from ${path}`);
+logger.info(`Logger initialized at level: ${process.env["LOG_LEVEL"]}`);
 
 export default logger;
