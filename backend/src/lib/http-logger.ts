@@ -1,9 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { pinoHttp, type Options } from "pino-http";
-import { Environments } from "../constants/index.js";
+import { isProd } from "../constants/index.js";
 import logger from "./logger.js";
 
-const isProd = ![Environments.LOCAL, Environments.DEVELOPMENT].includes(process.env["NODE_ENV"]!);
 const options: Options = {
   logger,
 
