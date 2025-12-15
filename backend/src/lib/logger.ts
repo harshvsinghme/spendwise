@@ -6,7 +6,7 @@ const path = `${process.cwd()}/.env.${process.env["NODE_ENV"]}`;
 
 if (!existsSync(path)) {
   console.error(`Environment file not found at path: ${path}`);
-  process.exit(0);
+  process.exit(1);
 }
 
 dotenv.config({
