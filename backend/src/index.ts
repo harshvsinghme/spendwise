@@ -1,4 +1,6 @@
+import cors from "cors";
 import express, { type Request, type Response } from "express";
+import { isLocal } from "./constants/index.js";
 import pool from "./lib/db.js";
 import { httpLogger } from "./lib/http-logger.js";
 import logger from "./lib/logger.js";
@@ -8,6 +10,13 @@ import { notFound } from "./middlewares/not-found.js";
 import router from "./routes/index.js";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: isLocal ? "http://localhost:3000" : ["https://mydomain.com"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(httpLogger);

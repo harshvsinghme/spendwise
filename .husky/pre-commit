@@ -1,0 +1,3 @@
+pnpm backend:lint
+pnpm backend:format
+pnpm backend:build

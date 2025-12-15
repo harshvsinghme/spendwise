@@ -25,4 +25,7 @@ const logger = pino({
   },
 });
 
+logger.info(`Environment loaded from ${path}`);
+logger.info(`Logger initialized at level: ${process.env["LOG_LEVEL"]}`);
+
 export default logger;

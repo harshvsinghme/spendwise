@@ -19,7 +19,6 @@
 //   }
 // }
 
-
 // import { asyncHandler } from "./async-handler.js";
 // import { AppError } from "../errors/app-error.js";
 // import { StatusCodes } from "http-status-codes";
@@ -40,7 +39,6 @@
 //   req.user = user;
 //   next();
 // });
-
 
 // app.get(
 //   "/protected",
