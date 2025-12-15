@@ -1,6 +1,6 @@
-import pino from "pino";
 import dotenv from "dotenv";
 import { existsSync } from "node:fs";
+import pino from "pino";
 
 const path = `${process.cwd()}/.env.${process.env["NODE_ENV"]}`;
 

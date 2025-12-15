@@ -1,12 +1,11 @@
 import express from "express";
 import { pinoHttp } from "pino-http";
-import logger from "./lib/logger.js";
 import pool from "./lib/db.js";
+import logger from "./lib/logger.js";
 
 const app = express();
 
 app.use(pinoHttp({ logger: logger }));
-
 
 setTimeout(async () => {
   try {
