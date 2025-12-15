@@ -9,6 +9,7 @@
     "backend:dev": "pnpm --filter backend dev",
     "backend:format": "pnpm --filter backend format",
     "backend:lint": "pnpm --filter backend lint",
+    "backend:every": "pnpm backend:lint && pnpm backend:format && pnpm backend:build",
     "prepare": "husky"
   },
   "dependencies": {
