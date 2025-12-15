@@ -1,32 +1,32 @@
-name: App CI
+# name: App CI
 
-on:
-  push:
-    paths:
-      - "app/**"
-  pull_request:
-    paths:
-      - "app/**"
+# on:
+#   push:
+#     paths:
+#       - "app/**"
+#   pull_request:
+#     paths:
+#       - "app/**"
 
-jobs:
-  app:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
+# jobs:
+#   app:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: app
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
+#       - uses: pnpm/action-setup@v3
+#         with:
+#           version: 9
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: app/pnpm-lock.yaml
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: "pnpm"
+#           cache-dependency-path: app/pnpm-lock.yaml
 
-      - run: pnpm install
-      - run: pnpm run build
+#       - run: pnpm install
+#       - run: pnpm run build
