@@ -9,7 +9,7 @@ import errorHandler from "./middlewares/error-handler.js";
 import { notFound } from "./middlewares/not-found.js";
 import router from "./routes/index.js";
 
-const app = express();
+// const app = express();
 
 app.use(
   cors({
