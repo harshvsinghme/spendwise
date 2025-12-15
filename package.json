@@ -8,6 +8,7 @@
     "backend:build": "pnpm --filter backend build",
     "backend:dev": "pnpm --filter backend dev",
     "backend:format": "pnpm --filter backend format",
-    "backend:lint": "pnpm --filter backend lint"
+    "backend:lint": "pnpm --filter backend lint",
+    "prepare": "husky"
   }
 }
