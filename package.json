@@ -9,6 +9,10 @@
     "backend:dev": "pnpm --filter backend dev",
     "backend:format": "pnpm --filter backend format",
     "backend:lint": "pnpm --filter backend lint",
+    "backend:migrate:create": "pnpm --filter backend migrate:create",
+    "backend:migrate:up": "pnpm --filter backend migrate:up",
+    "backend:migrate:down": "pnpm --filter backend migrate:down",
+    "backend:verify": "pnpm backend:lint && pnpm backend:format && pnpm backend:build",
     "prepare": "husky"
   },
   "dependencies": {
