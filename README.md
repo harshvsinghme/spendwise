@@ -1,1 +1,2 @@
-# spendwise
+- Local backend uses the Bun@1.3.4 as global installation
+    - npm i **-g** bun

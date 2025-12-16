@@ -1,10 +1,8 @@
 import cors from "cors";
-import express, { type Request, type Response } from "express";
+import express from "express";
 import { isLocal } from "./constants/index.js";
-import pool from "./lib/db.js";
 import { httpLogger } from "./lib/http-logger.js";
 import logger from "./lib/logger.js";
-import { asyncHandler } from "./middlewares/async-handler.js";
 import errorHandler from "./middlewares/error-handler.js";
 import { notFound } from "./middlewares/not-found.js";
 import router from "./routes/index.js";
@@ -20,15 +18,6 @@ app.use(
 
 app.use(express.json());
 app.use(httpLogger);
-
-app.get(
-  "/users",
-  asyncHandler(async (_req: Request, res: Response) => {
-    const { rows } = await pool.query("SELECT * FROM users");
-
-    res.json({ data: rows });
-  })
-);
 
 app.use("/", router);
 
