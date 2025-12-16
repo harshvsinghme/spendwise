@@ -27,7 +27,7 @@ export async function checkRedis() {
     if (redis.status !== "ready") {
       redis.disconnect();
       await redis.connect();
-      throw new Error("Reconnecting, Please try again")
+      throw new Error("Reconnecting, Please try again");
     }
     const pong = await redis.ping();
     if (pong !== "PONG") {
