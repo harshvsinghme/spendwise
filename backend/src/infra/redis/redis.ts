@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Redis } from "ioredis";
-import logger from "./logger.js";
+import logger from "../logger/logger.js";
 
 const redis = new Redis(process.env["REDIS_URL"]!, { enableReadyCheck: true });
 
