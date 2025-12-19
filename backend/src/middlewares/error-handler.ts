@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import logger from "../infra/logger/logger.js";
 import AppError from "../errors/app-error.js";
+import logger from "../infra/logger/logger.js";
 
 export default function errorHandler(
   err: unknown,

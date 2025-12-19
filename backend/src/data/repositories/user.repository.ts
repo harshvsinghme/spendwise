@@ -17,7 +17,7 @@ export class UserRepository {
     return rows;
   }
 
-  async create(id:number, name: string): Promise<User> {
+  async create(id: number, name: string): Promise<User> {
     const { rows } = await this.pool.query(
       `
       INSERT INTO users (id, name)

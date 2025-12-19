@@ -2,8 +2,8 @@ import { Router } from "express";
 import { UserController } from "../controllers/user.controller.js";
 import { UserRepository } from "../data/repositories/user.repository.js";
 import pool from "../infra/db/postgres.js";
-import { UserService } from "../services/user.service.js";
 import redis from "../infra/redis/redis.js";
+import { UserService } from "../services/user.service.js";
 
 const router: Router = Router();
 
