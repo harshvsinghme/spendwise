@@ -11,6 +11,11 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   REDIS_URL: z.url(),
   LOG_LEVEL: z.enum(["debug", "info", "error"]),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
+  ACCESS_TOKEN_TTL: z.enum(["15m"]),
+  REFRESH_TOKEN_TTL: z.enum(["30d"]),
+  APP_URL: z.url(),
 });
 
 export const validateEnvVars = () => {

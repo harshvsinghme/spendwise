@@ -16,7 +16,7 @@ const createApp = (): express.Application => {
     })
   );
 
-  app.use(express.json());
+  app.use(express.json({ limit: "10kb" }));
   app.use(httpLogger);
 
   app.use("/", router);
