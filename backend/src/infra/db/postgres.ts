@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Pool } from "pg";
-import logger from "./logger.js";
+import logger from "../logger/logger.js";
 
 const pool = new Pool({
   connectionString: process.env["DATABASE_URL"],
