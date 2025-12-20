@@ -21,15 +21,13 @@ Domain / Data Layer
 
 - repositories — database access (DAO)
 
-- db — PostgreSQL pool
-
 Infrastructure
 
 - redis
 
 - logger
 
-- config
+- db — PostgreSQL pool
 
 # Layered by responsibility, not by tech
 

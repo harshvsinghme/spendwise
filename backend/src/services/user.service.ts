@@ -1,5 +1,5 @@
 import type { Redis } from "ioredis";
-import type { UserRepository } from "../data/repositories/user.repository.js";
+import type { UserRepository } from "../repositories/user.repository.js";
 
 export class UserService {
   constructor(

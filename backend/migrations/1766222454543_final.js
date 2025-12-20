@@ -8,15 +8,11 @@ export const shorthands = undefined;
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
-export const up = (pgm) => {
-  pgm.sql(`insert into users(id, name) values('1', 'First User');`);
-};
+export const up = (_pgm) => {};
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
-export const down = (pgm) => {
-  pgm.sql(`delete from users where id='1';`);
-};
+export const down = (_pgm) => {};
