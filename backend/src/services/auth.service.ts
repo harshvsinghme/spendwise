@@ -27,11 +27,13 @@ export default class AuthService {
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
+    const REFRESH_TTL = 60 * 60 * 24 * 30;
+
     await this.redis
       .multi()
-      .set(`refresh:${refreshToken}`, user.id, "EX", 60 * 60 * 24 * 30)
+      .set(`refresh:${refreshToken}`, user.id, "EX", REFRESH_TTL)
       .sadd(`user:sessions:${user.id}`, refreshToken)
-      .expire(`user:sessions:${user.id}`, 60 * 60 * 24 * 30)
+      .expire(`user:sessions:${user.id}`, REFRESH_TTL)
       .exec();
 
     return { user, accessToken, refreshToken };
@@ -43,34 +45,22 @@ export default class AuthService {
     if (!user) {
       throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
     }
-    const ok = await comparePassword(data.password, user.password_hash);
 
+    const ok = await comparePassword(data.password, user.password_hash);
     if (!ok) {
       throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
-    }
-
-    // Invalidate existing refresh token(s)
-    const tokens = await this.redis.smembers(`user:sessions:${user.id}`);
-
-    if (tokens.length) {
-      const pipeline = this.redis.multi();
-
-      for (const token of tokens) {
-        pipeline.del(`refresh:${token}`);
-      }
-
-      pipeline.del(`user:sessions:${user.id}`);
-      await pipeline.exec();
     }
 
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
+    const REFRESH_TTL = 60 * 60 * 24 * 30;
+
     await this.redis
       .multi()
-      .set(`refresh:${refreshToken}`, user.id, "EX", 60 * 60 * 24 * 30)
+      .set(`refresh:${refreshToken}`, user.id, "EX", REFRESH_TTL)
       .sadd(`user:sessions:${user.id}`, refreshToken)
-      .expire(`user:sessions:${user.id}`, 60 * 60 * 24 * 30)
+      .expire(`user:sessions:${user.id}`, REFRESH_TTL)
       .exec();
 
     return {
