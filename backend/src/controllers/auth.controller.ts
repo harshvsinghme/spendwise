@@ -13,4 +13,9 @@ export default class AuthController {
     const result = await this.authService.login(req.body);
     res.json(result);
   };
+
+  refresh = async (req: Request, res: Response) => {
+    const result = await this.authService.refresh(req.body);
+    res.json(result);
+  };
 }

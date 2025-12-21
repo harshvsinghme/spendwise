@@ -22,3 +22,13 @@ export const loginSchema = z.object({
   query: z.object({}).strict(),
   params: z.object({}).strict(),
 });
+
+export const refreshSchema = z.object({
+  body: z
+    .object({
+      refreshToken: z.string().max(150),
+    })
+    .strict(),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
+});

@@ -12,8 +12,6 @@ export default class AuthService {
   ) {}
 
   async signup(data: { name: string; email: string; password: string }) {
-    // FIXME: Remove redis ping, It's only for testing connection issues
-    this.redis.ping();
     const existingUser = await this.userRepo.findByEmail(data.email);
     if (existingUser) {
       throw new AppError(`Email already in use`, StatusCodes.CONFLICT);
@@ -27,13 +25,11 @@ export default class AuthService {
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
-    const REFRESH_TTL = 60 * 60 * 24 * 30;
-
     await this.redis
       .multi()
-      .set(`refresh:${refreshToken}`, user.id, "EX", REFRESH_TTL)
+      .set(`refresh:${refreshToken}`, user.id, "EX", Number(process.env["REFRESH_TOKEN_TTL"]))
       .sadd(`user:sessions:${user.id}`, refreshToken)
-      .expire(`user:sessions:${user.id}`, REFRESH_TTL)
+      .expire(`user:sessions:${user.id}`, Number(process.env["REFRESH_TOKEN_TTL"]))
       .exec();
 
     return { user, accessToken, refreshToken };
@@ -54,13 +50,11 @@ export default class AuthService {
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
-    const REFRESH_TTL = 60 * 60 * 24 * 30;
-
     await this.redis
       .multi()
-      .set(`refresh:${refreshToken}`, user.id, "EX", REFRESH_TTL)
+      .set(`refresh:${refreshToken}`, user.id, "EX", Number(process.env["REFRESH_TOKEN_TTL"]))
       .sadd(`user:sessions:${user.id}`, refreshToken)
-      .expire(`user:sessions:${user.id}`, REFRESH_TTL)
+      .expire(`user:sessions:${user.id}`, Number(process.env["REFRESH_TOKEN_TTL"]))
       .exec();
 
     return {
@@ -71,6 +65,36 @@ export default class AuthService {
       },
       accessToken,
       refreshToken,
+    };
+  }
+
+  async refresh(data: { refreshToken: string }) {
+    const userId = await this.redis.get(`refresh:${data.refreshToken}`);
+
+    if (!userId) {
+      throw new AppError("Invalid refresh token", StatusCodes.UNAUTHORIZED);
+    }
+
+    // Rotate refresh token (per session)
+    await this.redis
+      .multi()
+      .del(`refresh:${data.refreshToken}`)
+      .srem(`user:sessions:${userId}`, data.refreshToken)
+      .exec();
+
+    const newRefreshToken = signRefreshToken(Number(userId));
+    const accessToken = signAccessToken(Number(userId));
+
+    await this.redis
+      .multi()
+      .set(`refresh:${newRefreshToken}`, userId, "EX", Number(process.env["REFRESH_TOKEN_TTL"]))
+      .sadd(`user:sessions:${userId}`, newRefreshToken)
+      .expire(`user:sessions:${userId}`, Number(process.env["REFRESH_TOKEN_TTL"]))
+      .exec();
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
     };
   }
 }

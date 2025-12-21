@@ -1,14 +1,28 @@
 import type { NextFunction, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 import type { IExtendedRequest } from "../types/common.js";
 import { verifyAccessToken } from "../utils/jwt.js";
 
-export const authMiddleware = (req: IExtendedRequest, _res: Response, next: NextFunction) => {
+export function requireAuth(req: IExtendedRequest, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
-  if (!header) throw new Error("Unauthorized");
+  if (!header) {
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return;
+  }
 
-  const token = header.replace("Bearer ", "");
-  const payload = verifyAccessToken(token);
+  const token = header.split(" ")[1];
+  if (!token) {
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return;
+  }
 
-  req.user = { id: payload.sub };
-  next();
-};
+  try {
+    const payload = verifyAccessToken(token);
+    req.user = {
+      id: payload.sub,
+    };
+    next();
+  } catch {
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+  }
+}
