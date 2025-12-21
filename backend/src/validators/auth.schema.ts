@@ -11,3 +11,14 @@ export const signupSchema = z.object({
   query: z.object({}).strict(),
   params: z.object({}).strict(),
 });
+
+export const loginSchema = z.object({
+  body: z
+    .object({
+      email: z.email().max(50),
+      password: z.string().min(4, "Password must be at least 4 characters long"),
+    })
+    .strict(),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
+});

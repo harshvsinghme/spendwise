@@ -8,4 +8,9 @@ export default class AuthController {
     const result = await this.authService.signup(req.body);
     res.json(result);
   };
+
+  login = async (req: Request, res: Response) => {
+    const result = await this.authService.login(req.body);
+    res.json(result);
+  };
 }

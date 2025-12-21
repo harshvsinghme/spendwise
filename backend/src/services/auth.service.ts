@@ -2,9 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import type { Redis } from "ioredis";
 import AppError from "../errors/app-error.js";
 import type UserRepository from "../repositories/user.repository.js";
-import { hashPassword } from "../utils/bcrypt.js";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
-import { storeRefreshToken } from "../utils/tokens.js";
 
 export default class AuthService {
   constructor(
@@ -28,8 +27,60 @@ export default class AuthService {
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
-    await storeRefreshToken(user.id, refreshToken);
+    await this.redis
+      .multi()
+      .set(`refresh:${refreshToken}`, user.id, "EX", 60 * 60 * 24 * 30)
+      .sadd(`user:sessions:${user.id}`, refreshToken)
+      .expire(`user:sessions:${user.id}`, 60 * 60 * 24 * 30)
+      .exec();
 
     return { user, accessToken, refreshToken };
+  }
+
+  async login(data: { email: string; password: string }) {
+    const user = await this.userRepo.findByEmail(data.email);
+
+    if (!user) {
+      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+    }
+    const ok = await comparePassword(data.password, user.password_hash);
+
+    if (!ok) {
+      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+    }
+
+    // Invalidate existing refresh token(s)
+    const tokens = await this.redis.smembers(`user:sessions:${user.id}`);
+
+    if (tokens.length) {
+      const pipeline = this.redis.multi();
+
+      for (const token of tokens) {
+        pipeline.del(`refresh:${token}`);
+      }
+
+      pipeline.del(`user:sessions:${user.id}`);
+      await pipeline.exec();
+    }
+
+    const accessToken = signAccessToken(user.id);
+    const refreshToken = signRefreshToken(user.id);
+
+    await this.redis
+      .multi()
+      .set(`refresh:${refreshToken}`, user.id, "EX", 60 * 60 * 24 * 30)
+      .sadd(`user:sessions:${user.id}`, refreshToken)
+      .expire(`user:sessions:${user.id}`, 60 * 60 * 24 * 30)
+      .exec();
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      accessToken,
+      refreshToken,
+    };
   }
 }
