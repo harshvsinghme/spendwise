@@ -32,3 +32,14 @@ export const refreshSchema = z.object({
   query: z.object({}).strict(),
   params: z.object({}).strict(),
 });
+
+export const logoutSchema = z.object({
+  body: z
+    .object({
+      refreshToken: z.string().max(150),
+      devices: z.enum(["current", "all"]),
+    })
+    .strict(),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
+});

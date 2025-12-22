@@ -97,4 +97,35 @@ export default class AuthService {
       refreshToken: newRefreshToken,
     };
   }
+
+  async logout(data: { refreshToken: string; devices: "current" | "all" }) {
+    const userId = await this.redis.get(`refresh:${data.refreshToken}`);
+    if (!userId) {
+      // Idempotent logout (safe to call multiple times)
+      return;
+    }
+
+    if (data.devices === "current") {
+      // logout only this session
+      await this.redis
+        .multi()
+        .del(`refresh:${data.refreshToken}`)
+        .srem(`user:sessions:${userId}`, data.refreshToken)
+        .exec();
+    }
+
+    if (data.devices === "all") {
+      // logout all sessions
+      const tokens = await this.redis.smembers(`user:sessions:${userId}`);
+
+      if (tokens.length) {
+        const pipeline = this.redis.multi();
+        for (const token of tokens) {
+          pipeline.del(`refresh:${token}`);
+        }
+        pipeline.del(`user:sessions:${userId}`);
+        await pipeline.exec();
+      }
+    }
+  }
 }
