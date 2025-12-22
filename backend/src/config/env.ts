@@ -13,8 +13,18 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "error"]),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
-  ACCESS_TOKEN_TTL: z.enum(["15m"]),
-  REFRESH_TOKEN_TTL: z.enum(["30d"]),
+  ACCESS_TOKEN_TTL: z.string().transform((val: string) => {
+    if (isNaN(Number(val))) {
+      throw new Error("ACCESS_TOKEN_TTL is not a valid number string");
+    }
+    return Number(val);
+  }),
+  REFRESH_TOKEN_TTL: z.string().transform((val: string) => {
+    if (isNaN(Number(val))) {
+      throw new Error("REFRESH_TOKEN_TTL is not a valid number string");
+    }
+    return Number(val);
+  }),
   APP_URL: z.url(),
 });
 

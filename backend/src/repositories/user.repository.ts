@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import type { IUserDB } from "../types/user.js";
 
 export default class UserRepository {
   constructor(private readonly pool: Pool) {}
@@ -14,12 +15,12 @@ export default class UserRepository {
     return rows[0];
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<IUserDB> {
     const { rows } = await this.pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
     return rows[0];
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<IUserDB> {
     const { rows } = await this.pool.query(`SELECT id, name, email FROM users WHERE id = $1`, [id]);
     return rows[0];
   }
