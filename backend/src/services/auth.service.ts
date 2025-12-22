@@ -11,7 +11,7 @@ export default class AuthService {
     private readonly redis: Redis
   ) {}
 
-  async signup(data: { name: string; email: string; password: string }) {
+  async signup(data: { name: string; email: string; password: string; currency: string }) {
     const existingUser = await this.userRepo.findByEmail(data.email);
     if (existingUser) {
       throw new AppError(`Email already in use`, StatusCodes.CONFLICT);
@@ -62,6 +62,7 @@ export default class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        currency: user.currency,
       },
       accessToken,
       refreshToken,
