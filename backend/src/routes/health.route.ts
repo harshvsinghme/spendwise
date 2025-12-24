@@ -1,9 +1,9 @@
-import dayjs from "dayjs";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { checkPostgres } from "../infra/db/postgres.js";
 import { checkRedis } from "../infra/redis/redis.js";
 import { asyncHandler } from "../middlewares/async-handler.js";
+import { utcTime } from "../utils/time.js";
 
 const router: Router = Router();
 
@@ -30,7 +30,7 @@ router.get(
         postgres,
         redis,
       },
-      timestamp: dayjs().toISOString(),
+      timestamp: utcTime(),
     });
   })
 );

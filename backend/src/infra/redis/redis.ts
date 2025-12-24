@@ -1,5 +1,5 @@
-import dayjs from "dayjs";
 import { Redis } from "ioredis";
+import { utcTime } from "../../utils/time.js";
 import logger from "../logger/logger.js";
 
 const redis = new Redis(process.env["REDIS_URL"]!, { enableReadyCheck: true });
@@ -21,7 +21,7 @@ redis.on("close", () => {
 });
 
 export async function checkRedis() {
-  const start = dayjs();
+  const start = utcTime();
 
   try {
     if (redis.status !== "ready") {
@@ -36,7 +36,7 @@ export async function checkRedis() {
 
     return {
       status: "up",
-      latencyMs: dayjs().diff(start),
+      latencyMs: utcTime().diff(start),
     };
   } catch (error) {
     return {

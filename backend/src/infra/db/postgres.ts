@@ -1,5 +1,5 @@
-import dayjs from "dayjs";
 import { Pool } from "pg";
+import { utcTime } from "../../utils/time.js";
 import logger from "../logger/logger.js";
 
 const pool = new Pool({
@@ -15,14 +15,14 @@ pool.on("error", (err: unknown) => {
 });
 
 export async function checkPostgres() {
-  const start = dayjs();
+  const start = utcTime();
 
   try {
     await pool.query("SELECT 1");
 
     return {
       status: "up",
-      latencyMs: dayjs().diff(start),
+      latencyMs: utcTime().diff(start),
     };
   } catch (error) {
     return {

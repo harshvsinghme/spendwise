@@ -1,5 +1,4 @@
 import { createHash, randomBytes } from "crypto";
-import dayjs from "dayjs";
 import { StatusCodes } from "http-status-codes";
 import type { Redis } from "ioredis";
 import AppError from "../errors/app-error.js";
@@ -9,6 +8,7 @@ import type PasswordResetRepository from "../repositories/passwordReset.reposito
 import type UserRepository from "../repositories/user.repository.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { utcTime } from "../utils/time.js";
 
 export default class AuthService {
   constructor(
@@ -145,7 +145,7 @@ export default class AuthService {
       await this.passwordResetRepo.create({
         token: tokenHash,
         user_id: user.id,
-        expires_at: dayjs().add(15, "minutes").toDate(),
+        expires_at: utcTime().add(15, "minutes").toDate(),
       });
 
       sendEmail({
