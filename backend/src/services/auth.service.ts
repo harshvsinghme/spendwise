@@ -1,6 +1,11 @@
+import { createHash, randomBytes } from "crypto";
+import dayjs from "dayjs";
 import { StatusCodes } from "http-status-codes";
 import type { Redis } from "ioredis";
 import AppError from "../errors/app-error.js";
+import { sendEmail } from "../infra/email/email.service.js";
+import { RESET_PASSWORD } from "../infra/email/templates/reset-password.js";
+import type PasswordResetRepository from "../repositories/passwordReset.repository.js";
 import type UserRepository from "../repositories/user.repository.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
@@ -8,6 +13,7 @@ import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 export default class AuthService {
   constructor(
     private readonly userRepo: UserRepository,
+    private readonly passwordResetRepo: PasswordResetRepository,
     private readonly redis: Redis
   ) {}
 
@@ -19,7 +25,7 @@ export default class AuthService {
     const hash = await hashPassword(data.password);
     const user = await this.userRepo.create({
       ...data,
-      passwordHash: hash,
+      password_hash: hash,
     });
 
     const accessToken = signAccessToken(user.id);
@@ -39,12 +45,12 @@ export default class AuthService {
     const user = await this.userRepo.findByEmail(data.email);
 
     if (!user) {
-      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+      throw new AppError("No matching user found", StatusCodes.UNAUTHORIZED);
     }
 
     const ok = await comparePassword(data.password, user.password_hash);
     if (!ok) {
-      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+      throw new AppError("No matching user found", StatusCodes.UNAUTHORIZED);
     }
 
     const accessToken = signAccessToken(user.id);
@@ -127,6 +133,26 @@ export default class AuthService {
         pipeline.del(`user:sessions:${userId}`);
         await pipeline.exec();
       }
+    }
+  }
+
+  async forgotPassword(data: { email: string }) {
+    const user = await this.userRepo.findByEmail(data.email);
+    if (user) {
+      const token = randomBytes(32).toString("hex");
+      const tokenHash = createHash("sha256").update(token).digest("hex");
+
+      await this.passwordResetRepo.create({
+        token: tokenHash,
+        user_id: user.id,
+        expires_at: dayjs().add(15, "minutes").toDate(),
+      });
+
+      sendEmail({
+        template: RESET_PASSWORD,
+        data: { name: user.name, link: `${process.env["APP_URL"]}/reset-password?token=${token}` },
+        recipients: [data.email],
+      });
     }
   }
 }
