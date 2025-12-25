@@ -1,7 +1,9 @@
 # Notes
+docker compose down -v
+docker compose build --no-cache
+docker compose up
 
-- Local backend uses **Bun v1.3.4** as a global installation  
-  - `npm i -g bun`
+docker exec -it spendwise-backend-1 sh
 
 # Architecture
 
