@@ -3,5 +3,6 @@ export interface IUserDB {
   name: string;
   email: string;
   password_hash: string;
+  currency: string;
   created_at: Date;
 }

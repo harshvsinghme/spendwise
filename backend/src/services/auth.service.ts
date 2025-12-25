@@ -1,17 +1,23 @@
+import { createHash, randomBytes } from "crypto";
 import { StatusCodes } from "http-status-codes";
 import type { Redis } from "ioredis";
 import AppError from "../errors/app-error.js";
+import { sendEmail } from "../infra/email/email.service.js";
+import { RESET_PASSWORD } from "../infra/email/templates/reset-password.js";
+import type PasswordResetRepository from "../repositories/passwordReset.repository.js";
 import type UserRepository from "../repositories/user.repository.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { utcTime } from "../utils/time.js";
 
 export default class AuthService {
   constructor(
     private readonly userRepo: UserRepository,
+    private readonly passwordResetRepo: PasswordResetRepository,
     private readonly redis: Redis
   ) {}
 
-  async signup(data: { name: string; email: string; password: string }) {
+  async signup(data: { name: string; email: string; password: string; currency: string }) {
     const existingUser = await this.userRepo.findByEmail(data.email);
     if (existingUser) {
       throw new AppError(`Email already in use`, StatusCodes.CONFLICT);
@@ -19,7 +25,7 @@ export default class AuthService {
     const hash = await hashPassword(data.password);
     const user = await this.userRepo.create({
       ...data,
-      passwordHash: hash,
+      password_hash: hash,
     });
 
     const accessToken = signAccessToken(user.id);
@@ -39,12 +45,12 @@ export default class AuthService {
     const user = await this.userRepo.findByEmail(data.email);
 
     if (!user) {
-      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+      throw new AppError("No matching user found", StatusCodes.UNAUTHORIZED);
     }
 
     const ok = await comparePassword(data.password, user.password_hash);
     if (!ok) {
-      throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
+      throw new AppError("No matching user found", StatusCodes.UNAUTHORIZED);
     }
 
     const accessToken = signAccessToken(user.id);
@@ -62,6 +68,7 @@ export default class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        currency: user.currency,
       },
       accessToken,
       refreshToken,
@@ -127,5 +134,51 @@ export default class AuthService {
         await pipeline.exec();
       }
     }
+  }
+
+  async forgotPassword(data: { email: string }) {
+    const user = await this.userRepo.findByEmail(data.email);
+    if (user) {
+      const token = randomBytes(32).toString("hex");
+      const tokenHash = createHash("sha256").update(token).digest("hex");
+
+      await this.passwordResetRepo.create({
+        token: tokenHash,
+        user_id: user.id,
+        expires_at: utcTime().add(15, "minutes").toDate(),
+      });
+
+      sendEmail({
+        template: RESET_PASSWORD,
+        data: { name: user.name, link: `${process.env["APP_URL"]}/reset-password?token=${token}` },
+        recipients: [data.email],
+      });
+    }
+    return { message: `A reset password token is sent to your registered email, if it exists` };
+  }
+  async resetPassword(data: { token: string; password: string }) {
+    // encrypt the token and find its hash record in DB
+    const tokenHash = createHash("sha256").update(data.token).digest("hex");
+    const passRecord = await this.passwordResetRepo.findByToken(tokenHash);
+
+    // validate the password_resets request expires_at
+    if (!passRecord || utcTime().isAfter(passRecord.expires_at)) {
+      throw new AppError("Invalid or expired reset token", StatusCodes.BAD_REQUEST);
+    }
+
+    // validate user existence against password_resets.user_id
+    const userRecord = await this.userRepo.findById(passRecord.user_id);
+    if (!userRecord) {
+      throw new AppError(
+        `The user whose password you want to change does not exist`,
+        StatusCodes.CONFLICT
+      );
+    }
+    // hash the password with bcrypt
+    const passHash = await hashPassword(data.password);
+    // update users with user_id for its password (new)
+    await this.userRepo.updatePassword(userRecord.id, passHash);
+    // delete password_resets records for user_id
+    await this.passwordResetRepo.deleteByUserId(userRecord.id);
   }
 }

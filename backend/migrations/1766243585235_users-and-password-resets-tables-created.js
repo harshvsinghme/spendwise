@@ -28,7 +28,7 @@ export const up = (pgm) => {
       notNull: true,
     },
     created_at: {
-      type: "timestamp",
+      type: "TIMESTAMPTZ",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
@@ -46,11 +46,11 @@ export const up = (pgm) => {
       onDelete: "CASCADE",
     },
     expires_at: {
-      type: "timestamp",
+      type: "TIMESTAMPTZ",
       notNull: true,
     },
     created_at: {
-      type: "timestamp",
+      type: "TIMESTAMPTZ",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
