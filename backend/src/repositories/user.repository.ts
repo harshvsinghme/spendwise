@@ -15,17 +15,17 @@ export default class UserRepository {
     return rows[0];
   }
 
-  async findByEmail(email: string): Promise<IUserDB> {
+  async findByEmail(email: string): Promise<IUserDB | undefined> {
     const { rows } = await this.pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
     return rows[0];
   }
 
-  // async findById(id: string): Promise<IUserDB> {
-  //   const { rows } = await this.pool.query(`SELECT id, name, email FROM users WHERE id = $1`, [id]);
-  //   return rows[0];
-  // }
+  async findById(id: number): Promise<IUserDB | undefined> {
+    const { rows } = await this.pool.query(`SELECT id, name, email FROM users WHERE id = $1`, [id]);
+    return rows[0];
+  }
 
-  // async updatePassword(id: string, passwordHash: string) {
-  //   await this.pool.query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, id]);
-  // }
+  async updatePassword(id: number, passwordHash: string) {
+    await this.pool.query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, id]);
+  }
 }

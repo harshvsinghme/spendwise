@@ -12,6 +12,7 @@ import {
   loginSchema,
   logoutSchema,
   refreshSchema,
+  resetPasswordSchema,
   signupSchema,
 } from "../validators/auth.schema.js";
 
@@ -30,6 +31,11 @@ router.post(
   "/forgot-password",
   validate(forgotPasswordSchema),
   asyncHandler(authController.forgotPassword)
+);
+router.post(
+  "/reset-password",
+  validate(resetPasswordSchema),
+  asyncHandler(authController.resetPassword)
 );
 
 export default router;

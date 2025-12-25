@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import type { IPasswordResetsDB } from "../types/passwordResets.js";
 
 export default class PasswordResetRepository {
   constructor(private readonly pool: Pool) {}
@@ -13,8 +14,13 @@ export default class PasswordResetRepository {
     return rows[0];
   }
 
-  // async findByToken(token: string): Promise<IUserDB> {
-  //   const { rows } = await this.pool.query(`SELECT * FROM password_resets WHERE token = $1`, [token]);
-  //   return rows[0];
-  // }
+  async findByToken(token: string): Promise<IPasswordResetsDB | undefined> {
+    const { rows } = await this.pool.query(`SELECT * FROM password_resets WHERE token = $1`, [
+      token,
+    ]);
+    return rows[0];
+  }
+  async deleteByUserId(id: number) {
+    await this.pool.query(`DELETE FROM password_resets WHERE user_id = $1`, [id]);
+  }
 }

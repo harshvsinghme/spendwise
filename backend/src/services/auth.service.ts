@@ -154,5 +154,31 @@ export default class AuthService {
         recipients: [data.email],
       });
     }
+    return { message: `A reset password token is sent to your registered email, if it exists` };
+  }
+  async resetPassword(data: { token: string; password: string }) {
+    // encrypt the token and find its hash record in DB
+    const tokenHash = createHash("sha256").update(data.token).digest("hex");
+    const passRecord = await this.passwordResetRepo.findByToken(tokenHash);
+
+    // validate the password_resets request expires_at
+    if (!passRecord || utcTime().isAfter(passRecord.expires_at)) {
+      throw new AppError("Invalid or expired reset token", StatusCodes.BAD_REQUEST);
+    }
+
+    // validate user existence against password_resets.user_id
+    const userRecord = await this.userRepo.findById(passRecord.user_id);
+    if (!userRecord) {
+      throw new AppError(
+        `The user whose password you want to change does not exist`,
+        StatusCodes.CONFLICT
+      );
+    }
+    // hash the password with bcrypt
+    const passHash = await hashPassword(data.password);
+    // update users with user_id for its password (new)
+    await this.userRepo.updatePassword(userRecord.id, passHash);
+    // delete password_resets records for user_id
+    await this.passwordResetRepo.deleteByUserId(userRecord.id);
   }
 }

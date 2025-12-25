@@ -54,3 +54,13 @@ export const forgotPasswordSchema = z.object({
   query: z.object({}).strict(),
   params: z.object({}).strict(),
 });
+export const resetPasswordSchema = z.object({
+  body: z
+    .object({
+      token: z.string().min(10).max(64),
+      password: z.string().min(4, "Password must be at least 4 characters long").max(50),
+    })
+    .strict(),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
+});

@@ -26,4 +26,8 @@ export default class AuthController {
     const result = await this.authService.forgotPassword(req.body);
     res.json(result);
   };
+  resetPassword = async (req: Request, res: Response) => {
+    const result = await this.authService.resetPassword(req.body);
+    res.json(result);
+  };
 }
