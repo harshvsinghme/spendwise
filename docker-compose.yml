@@ -3,6 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.local
+    image: spendwise-backend:1.0
     ports:
       - "4000:4000"
     volumes:
