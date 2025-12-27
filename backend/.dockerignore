@@ -1,6 +1,4 @@
-dist
 node_modules
-.env.development
 .env.local
-.env.production
+.env.prod
 .DS_Store

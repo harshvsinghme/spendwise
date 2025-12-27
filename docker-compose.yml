@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.local
-    image: spendwise-backend:1.0
+    image: spendwise-backend:local
     ports:
       - "4000:4000"
     volumes:
@@ -18,7 +18,7 @@ services:
   postgres:
     image: postgres:18.1
     environment:
-      POSTGRES_DB: SpendWise
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
     ports:
