@@ -6,7 +6,7 @@ export const signupSchema = z.object({
       name: z.string().min(2).max(50),
       email: z.email().max(50),
       password: z.string().min(4, "Password must be at least 4 characters long").max(50),
-      currency: z.string().length(3),
+      currency: z.enum([`₹`]),
     })
     .strict(),
   query: z.object({}).strict(),
