@@ -11,9 +11,9 @@ export const shorthands = undefined;
 export const up = (pgm) => {
   pgm.addColumn("users", {
     currency: {
-      type: "varchar(80)",
+      type: "varchar(1)",
       notNull: true,
-      default: "INR",
+      default: "₹",
     },
   });
 };
