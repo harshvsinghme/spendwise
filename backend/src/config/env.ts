@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["local", "development", "production"]),
+  NODE_ENV: z.enum(["local", "prod"]),
   PORT: z.string().transform((val: string) => {
     if (isNaN(Number(val))) {
       throw new Error("PORT is not a valid number string");
