@@ -19,8 +19,14 @@ export default class BudgetService {
     const existingBudget = await this.db.withUser(userId, (client) =>
       this.budgetRepo.getMyBudget(client, { month: data.month, year: data.year })
     );
+
     if (existingBudget) {
-      // TODO: update the monthly_limit only
+      await this.db.withUser(userId, (client) =>
+        this.budgetRepo.updateMyBudget(client, {
+          id: existingBudget.id,
+          monthlyLimit: data.monthlyLimit,
+        })
+      );
     } else {
       await this.db.withUser(userId, (client) =>
         this.budgetRepo.createMyBudget(client, {

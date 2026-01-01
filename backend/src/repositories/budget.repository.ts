@@ -19,10 +19,17 @@ export default class BudgetRepository {
   }
 
   async getMyBudget(client: PoolClient, data: { month: number; year: number }) {
-    const { rows } = await client.query(
-      `SELECT * FROM budgets WHERE user_id = current_setting('app.user_id')::int AND month = $1 AND year = $2`,
-      [data.month, data.year]
-    );
+    const { rows } = await client.query(`SELECT * FROM budgets WHERE month = $1 AND year = $2`, [
+      data.month,
+      data.year,
+    ]);
     return rows[0];
+  }
+
+  async updateMyBudget(client: PoolClient, data: { id: number; monthlyLimit: number }) {
+    await client.query(`update budgets set monthly_limit = $1 where id = $2`, [
+      data.monthlyLimit,
+      data.id,
+    ]);
   }
 }
