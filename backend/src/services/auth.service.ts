@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "crypto";
 import { StatusCodes } from "http-status-codes";
 import type { Redis } from "ioredis";
 import AppError from "../errors/app-error.js";
+import type { DB } from "../infra/db/db.js";
 import { sendEmail } from "../infra/email/email.service.js";
 import { RESET_PASSWORD } from "../infra/email/templates/reset-password.js";
 import type PasswordResetRepository from "../repositories/passwordReset.repository.js";
@@ -14,19 +15,26 @@ export default class AuthService {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly passwordResetRepo: PasswordResetRepository,
+    private readonly db: DB,
     private readonly redis: Redis
   ) {}
 
   async signup(data: { name: string; email: string; password: string; currency: string }) {
-    const existingUser = await this.userRepo.findByEmail(data.email);
+    const existingUser = await this.db.withoutUser((client) =>
+      this.userRepo.findByEmail(client, { email: data.email })
+    );
     if (existingUser) {
       throw new AppError(`Email already in use`, StatusCodes.CONFLICT);
     }
     const hash = await hashPassword(data.password);
-    const user = await this.userRepo.create({
-      ...data,
-      password_hash: hash,
-    });
+    const user = await this.db.withoutUser((client) =>
+      this.userRepo.create(client, {
+        name: data.name,
+        email: data.email,
+        password_hash: hash,
+        currency: data.currency,
+      })
+    );
 
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
@@ -42,7 +50,9 @@ export default class AuthService {
   }
 
   async login(data: { email: string; password: string }) {
-    const user = await this.userRepo.findByEmail(data.email);
+    const user = await this.db.withoutUser((client) =>
+      this.userRepo.findByEmail(client, { email: data.email })
+    );
 
     if (!user) {
       throw new AppError("No matching user found", StatusCodes.UNAUTHORIZED);
@@ -137,16 +147,20 @@ export default class AuthService {
   }
 
   async forgotPassword(data: { email: string }) {
-    const user = await this.userRepo.findByEmail(data.email);
+    const user = await this.db.withoutUser((client) =>
+      this.userRepo.findByEmail(client, { email: data.email })
+    );
     if (user) {
       const token = randomBytes(32).toString("hex");
       const tokenHash = createHash("sha256").update(token).digest("hex");
 
-      await this.passwordResetRepo.create({
-        token: tokenHash,
-        user_id: user.id,
-        expires_at: utcTime().add(15, "minutes").toDate(),
-      });
+      await this.db.withoutUser((client) =>
+        this.passwordResetRepo.create(client, {
+          token: tokenHash,
+          user_id: user.id,
+          expires_at: utcTime().add(15, "minutes").toDate(),
+        })
+      );
 
       sendEmail({
         template: RESET_PASSWORD,
@@ -159,7 +173,9 @@ export default class AuthService {
   async resetPassword(data: { token: string; password: string }) {
     // encrypt the token and find its hash record in DB
     const tokenHash = createHash("sha256").update(data.token).digest("hex");
-    const passRecord = await this.passwordResetRepo.findByToken(tokenHash);
+    const passRecord = await this.db.withoutUser((client) =>
+      this.passwordResetRepo.findByToken(client, { token: tokenHash })
+    );
 
     // validate the password_resets request expires_at
     if (!passRecord || utcTime().isAfter(passRecord.expires_at)) {
@@ -167,7 +183,9 @@ export default class AuthService {
     }
 
     // validate user existence against password_resets.user_id
-    const userRecord = await this.userRepo.findById(passRecord.user_id);
+    const userRecord = await this.db.withoutUser((client) =>
+      this.userRepo.findById(client, { userId: passRecord.user_id })
+    );
     if (!userRecord) {
       throw new AppError(
         `The user whose password you want to change does not exist`,
@@ -177,8 +195,12 @@ export default class AuthService {
     // hash the password with bcrypt
     const passHash = await hashPassword(data.password);
     // update users with user_id for its password (new)
-    await this.userRepo.updatePassword(userRecord.id, passHash);
+    await this.db.withoutUser((client) =>
+      this.userRepo.updatePassword(client, { userId: userRecord.id, passwordHash: passHash })
+    );
     // delete password_resets records for user_id
-    await this.passwordResetRepo.deleteByUserId(userRecord.id);
+    await this.db.withoutUser((client) =>
+      this.passwordResetRepo.deleteByUserId(client, { user_id: userRecord.id })
+    );
   }
 }

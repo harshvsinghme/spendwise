@@ -1,12 +1,10 @@
-import type { Pool, PoolClient } from "pg";
-import type { IExpenseDB } from "../types/expense.js";
+import type { Pool } from "pg";
 
 export default class ExpenseRepository {
   constructor(private readonly pool: Pool) {}
 
-  async findAll(client?: PoolClient): Promise<IExpenseDB[]> {
-    const executor = client ?? this.pool;
-    const res = await executor.query(`SELECT * FROM expenses`);
+  async findAll() {
+    const res = await this.pool.query(`SELECT * FROM expenses`);
     return res.rows;
   }
 }

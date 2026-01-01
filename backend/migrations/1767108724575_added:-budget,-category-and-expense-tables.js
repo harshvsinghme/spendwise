@@ -47,7 +47,7 @@ export const up = (pgm) => {
       onDelete: "CASCADE",
     },
     amount: {
-      type: "money",
+      type: "integer",
       notNull: true,
     },
     category_id: {
@@ -83,7 +83,7 @@ export const up = (pgm) => {
       onDelete: "CASCADE",
     },
     monthly_limit: {
-      type: "money",
+      type: "integer",
       notNull: true,
     },
     month: {

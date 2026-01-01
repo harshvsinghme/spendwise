@@ -1,31 +1,38 @@
-import type { Pool } from "pg";
-import type { IUserDB } from "../types/user.js";
+import type { PoolClient } from "pg";
 
 export default class UserRepository {
-  constructor(private readonly pool: Pool) {}
-  async create(user: { name: string; email: string; password_hash: string }) {
-    const { rows } = await this.pool.query(
+  constructor() {}
+  async create(
+    client: PoolClient,
+    data: { name: string; email: string; password_hash: string; currency: string }
+  ) {
+    const { rows } = await client.query(
       `
-      INSERT INTO users (name, email, password_hash)
-      VALUES ($1, $2, $3)
+      INSERT INTO users (name, email, password_hash, currency)
+      VALUES ($1, $2, $3, $4)
       RETURNING id, name, email, currency
       `,
-      [user.name, user.email, user.password_hash]
+      [data.name, data.email, data.password_hash, data.currency]
     );
     return rows[0];
   }
 
-  async findByEmail(email: string): Promise<IUserDB | undefined> {
-    const { rows } = await this.pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+  async findByEmail(client: PoolClient, data: { email: string }) {
+    const { rows } = await client.query(`SELECT * FROM users WHERE email = $1`, [data.email]);
     return rows[0];
   }
 
-  async findById(id: number): Promise<IUserDB | undefined> {
-    const { rows } = await this.pool.query(`SELECT id, name, email FROM users WHERE id = $1`, [id]);
+  async findById(client: PoolClient, data: { userId: number }) {
+    const { rows } = await client.query(`SELECT id, name, email FROM users WHERE id = $1`, [
+      data.userId,
+    ]);
     return rows[0];
   }
 
-  async updatePassword(id: number, passwordHash: string) {
-    await this.pool.query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, id]);
+  async updatePassword(client: PoolClient, data: { userId: number; passwordHash: string }) {
+    await client.query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [
+      data.passwordHash,
+      data.userId,
+    ]);
   }
 }
