@@ -8,7 +8,7 @@ import validate from "../middlewares/validate.middleware.js";
 import BudgetRepository from "../repositories/budget.repository.js";
 import UserRepository from "../repositories/user.repository.js";
 import BudgetService from "../services/budget.service.js";
-import { budgetSchema } from "../validators/budget.schema.js";
+import { createBudgetSchema, deleteBudgetSchema } from "../validators/budget.schema.js";
 
 const router: Router = Router();
 
@@ -18,10 +18,17 @@ const budgetService = new BudgetService(budgetRepo, db, redis);
 const budgetController = new BudgetController(budgetService);
 
 router.post(
-  "/mine",
+  "/",
   requireAuth(userRepo, db),
-  validate(budgetSchema),
+  validate(createBudgetSchema),
   asyncHandler(budgetController.createMyBudget)
+);
+
+router.delete(
+  "/:id",
+  requireAuth(userRepo, db),
+  validate(deleteBudgetSchema),
+  asyncHandler(budgetController.deleteMyBudget)
 );
 
 export default router;

@@ -37,4 +37,9 @@ export default class BudgetService {
       );
     }
   }
+  async deleteMyBudget(userId: number, data: { id: number }) {
+    await this.db.withUser(userId, (client) =>
+      this.budgetRepo.deleteMyBudget(client, { id: data.id })
+    );
+  }
 }

@@ -19,6 +19,7 @@
 -- ON TABLES TO spendwise_app;
 
 select * from budgets;
+-- delete from budgets;
 
 -- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO spendwise_app;
 -- ALTER DEFAULT PRIVILEGES IN SCHEMA public

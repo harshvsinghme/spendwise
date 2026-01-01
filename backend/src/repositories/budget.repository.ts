@@ -32,4 +32,8 @@ export default class BudgetRepository {
       data.id,
     ]);
   }
+
+  async deleteMyBudget(client: PoolClient, data: { id: number }) {
+    await client.query(`delete from budgets where id = $1`, [data.id]);
+  }
 }

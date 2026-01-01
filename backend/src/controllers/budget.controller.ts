@@ -14,4 +14,15 @@ export default class BudgetController {
     const result = await this.budgetService.createMyBudget(req.user.id, req.body);
     res.json(result);
   };
+
+  deleteMyBudget = async (req: IExtendedRequest, res: Response) => {
+    if (!req.user) {
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+      return;
+    }
+    const result = await this.budgetService.deleteMyBudget(req.user.id, {
+      id: Number(req.params["id"]),
+    });
+    res.json(result);
+  };
 }
