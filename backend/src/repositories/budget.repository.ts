@@ -9,7 +9,7 @@ export default class BudgetRepository {
   ) {
     const { rows } = await client.query(
       `
-       INSERT INTO budgets (user_id, monthly_limit, month, year)
+      INSERT INTO budgets (user_id, monthly_limit, month, year)
       VALUES (current_setting('app.user_id')::int, $1, $2, $3)
       RETURNING id, monthly_limit, month, year
       `,

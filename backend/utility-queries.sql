@@ -1,5 +1,5 @@
 -- select * from users;
--- select * from categories;
+select * from categories;
 
 -- select * from expenses;
 
@@ -18,7 +18,7 @@
 -- GRANT SELECT, INSERT, UPDATE, DELETE
 -- ON TABLES TO spendwise_app;
 
-select * from budgets;
+-- select * from budgets;
 -- delete from budgets;
 
 -- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO spendwise_app;

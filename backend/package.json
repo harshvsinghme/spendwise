@@ -11,8 +11,8 @@
     "format": "prettier --write '**/*.{ts,json}' --config ./.prettierrc",
     "lint": "eslint . --fix",
     "migrate:create": "node-pg-migrate create --migrationsDir migrations",
-    "migrate:up": "dotenv -e .env.$NODE_ENV -- node-pg-migrate up --migrationsDir migrations",
-    "migrate:down": "dotenv -e .env.$NODE_ENV -- node-pg-migrate down --migrationsDir migrations",
+    "migrate:up": "node-pg-migrate up --migrationsDir migrations",
+    "migrate:down": "node-pg-migrate down --migrationsDir migrations",
     "verify": "pnpm lint && pnpm format && pnpm build"
   },
   "keywords": [],
@@ -44,7 +44,6 @@
     "@types/node": "^25.0.2",
     "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.16.0",
-    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "node-pg-migrate": "^8.0.4",
