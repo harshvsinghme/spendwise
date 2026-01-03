@@ -14,4 +14,13 @@ export default class CategoryController {
     const result = await this.catService.create(req.user.id, req.body);
     res.json(result);
   };
+
+  get = async (req: IExtendedRequest, res: Response) => {
+    if (!req.user) {
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+      return;
+    }
+    const result = await this.catService.get(req.user.id, req.query);
+    res.json(result);
+  };
 }

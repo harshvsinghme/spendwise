@@ -14,4 +14,13 @@ export default class CategoryRepository {
     );
     return rows[0];
   }
+
+  async get(client: PoolClient, _filters: object) {
+    const { rows } = await client.query(
+      `
+      SELECT * FROM categories ORDER BY id DESC
+      `
+    );
+    return rows;
+  }
 }

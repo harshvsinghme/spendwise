@@ -8,7 +8,7 @@ import validate from "../middlewares/validate.middleware.js";
 import CategoryRepository from "../repositories/category.repository.js";
 import UserRepository from "../repositories/user.repository.js";
 import CategoryService from "../services/category.service.js";
-import { createCategorySchema } from "../validators/category.schema.js";
+import { createCategorySchema, getCategoriesSchema } from "../validators/category.schema.js";
 
 const router: Router = Router();
 
@@ -22,6 +22,13 @@ router.post(
   requireAuth(userRepo, db),
   validate(createCategorySchema),
   asyncHandler(catController.create)
+);
+
+router.get(
+  "/",
+  requireAuth(userRepo, db),
+  validate(getCategoriesSchema),
+  asyncHandler(catController.get)
 );
 
 export default router;

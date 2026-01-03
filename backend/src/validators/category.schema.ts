@@ -10,3 +10,9 @@ export const createCategorySchema = z.object({
   query: z.object({}).strict(),
   params: z.object({}).strict(),
 });
+
+export const getCategoriesSchema = z.object({
+  body: z.undefined(),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
+});

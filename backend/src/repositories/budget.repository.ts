@@ -27,13 +27,13 @@ export default class BudgetRepository {
   }
 
   async updateMyBudget(client: PoolClient, data: { id: number; monthlyLimit: number }) {
-    await client.query(`update budgets set monthly_limit = $1 where id = $2`, [
+    await client.query(`UPDATE budgets SET monthly_limit = $1 WHERE id = $2`, [
       data.monthlyLimit,
       data.id,
     ]);
   }
 
   async deleteMyBudget(client: PoolClient, data: { id: number }) {
-    await client.query(`delete from budgets where id = $1`, [data.id]);
+    await client.query(`DELETE FROM budgets WHERE id = $1`, [data.id]);
   }
 }

@@ -7,10 +7,7 @@ export default class CategoryService {
     private readonly catRepo: CategoryRepository,
     private readonly db: DB,
     private readonly redis: Redis
-  ) {
-    // TODO: let's use redis at required place and remove from here
-    this.redis.ping();
-  }
+  ) {}
 
   async create(userId: number, data: { name: string; icon: string }) {
     await this.db.withUser(userId, (client) =>
@@ -19,5 +16,23 @@ export default class CategoryService {
         icon: data.icon,
       })
     );
+
+    const cached = await this.redis.get(`categories:${userId}`);
+    if (cached) {
+      this.redis.del(`categories:${userId}`);
+    }
+  }
+
+  async get(userId: number, filters: object) {
+    const cached = await this.redis.get(`categories:${userId}`);
+    if (cached) {
+      return { categories: JSON.parse(cached) };
+    }
+    const categories = await this.db.withUser(userId, (client) =>
+      this.catRepo.get(client, filters)
+    );
+
+    this.redis.set(`categories:${userId}`, JSON.stringify(categories), "EX", 60);
+    return { categories };
   }
 }
