@@ -18,7 +18,7 @@ export default class CategoryRepository {
   async get(client: PoolClient, _filters: object) {
     const { rows } = await client.query(
       `
-      SELECT * FROM categories ORDER BY id DESC
+      SELECT id, name, icon, created_at FROM categories ORDER BY id DESC
       `
     );
     return rows;

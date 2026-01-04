@@ -1,5 +1,6 @@
 -- select * from users;
 select * from categories;
+-- delete from categories;
 
 -- select * from expenses;
 
