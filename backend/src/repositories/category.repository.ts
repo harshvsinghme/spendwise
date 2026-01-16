@@ -23,4 +23,14 @@ export default class CategoryRepository {
     );
     return rows;
   }
+
+  async getById(client: PoolClient, data: { id: number }) {
+    const { rows } = await client.query(
+      `
+      SELECT id, name, icon, created_at FROM categories WHERE id = $1
+      `,
+      [data.id]
+    );
+    return rows[0];
+  }
 }

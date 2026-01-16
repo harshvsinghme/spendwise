@@ -1,10 +1,3 @@
-# Notes
-docker compose down -v
-docker compose build --no-cache
-docker compose up
-
-docker exec -it spendwise-backend-1 sh
-
 # Architecture
 
 HTTP Layer
@@ -40,3 +33,10 @@ data = persistence
 services = business rules
 
 http layer = routes/controllers/middlewares
+
+# Docker Scripts
+docker compose down -v
+docker compose build --no-cache
+docker compose up
+
+docker exec -it spendwise-backend-1 sh
