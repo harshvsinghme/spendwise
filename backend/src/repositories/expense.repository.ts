@@ -5,7 +5,7 @@ export default class ExpenseRepository {
 
   async create(
     client: PoolClient,
-    data: { amount: number; categoryId: number; note: string; expenseDate: Date }
+    data: { amount: number; categoryId: number; note: string; expenseDate: string }
   ) {
     const { rows } = await client.query(
       `
@@ -25,5 +25,22 @@ export default class ExpenseRepository {
       `
     );
     return rows;
+  }
+
+  async sumOfMonth(
+    client: PoolClient,
+    data: { month: number; year: number }
+  ): Promise<undefined | number> {
+    const { rows } = await client.query(
+      `
+      SELECT COALESCE(SUM(amount), 0)::numeric AS total
+      FROM expenses
+      WHERE expense_date >= make_date($2, $1 + 1, 1)
+        AND expense_date <  (make_date($2, $1 + 1, 1) + INTERVAL '1 month')
+      `,
+      [data.month, data.year]
+    );
+
+    return Number(rows[0].total);
   }
 }

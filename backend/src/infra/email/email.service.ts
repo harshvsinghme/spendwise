@@ -1,5 +1,6 @@
 import logger from "../logger/logger.js";
 import { emailClient } from "./email.client.js";
+import { BUDGET_WARNING, budgetWarningTemplate } from "./templates/budget-warning.js";
 import { RESET_PASSWORD, resetPasswordTemplate } from "./templates/reset-password.js";
 
 export function sendEmail({
@@ -8,7 +9,7 @@ export function sendEmail({
   recipients,
 }: {
   template: string;
-  data: Record<string, string>;
+  data: Record<string, unknown>;
   recipients: Array<string>;
 }) {
   let subject = `Spendwise`;
@@ -16,6 +17,16 @@ export function sendEmail({
     case RESET_PASSWORD:
       subject = `Reset Password for Spendwise`;
       template = resetPasswordTemplate(data["name"] ?? "", data["link"] ?? "");
+      break;
+
+    case BUDGET_WARNING:
+      subject = `Budget Warning from Spendwise`;
+      template = budgetWarningTemplate(
+        data["name"] ?? "",
+        data["utilisedPercentage"] ?? 0,
+        data["month"] ?? "",
+        data["year"] ?? 0
+      );
       break;
 
     default:

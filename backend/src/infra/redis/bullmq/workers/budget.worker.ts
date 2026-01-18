@@ -1,7 +1,10 @@
 import { Job, Worker } from "bullmq";
 import { cpus } from "node:os";
+import { sendEmail } from "../../../email/email.service.js";
+import { BUDGET_WARNING } from "../../../email/templates/budget-warning.js";
 import logger from "../../../logger/logger.js";
 import redisForBullMq from "../redis.js";
+import dayjs from "dayjs";
 
 const attachBudgetWorker = () => {
   logger.info(`Attaching BullMQ consumer to 'budget-queue'...`);
@@ -9,21 +12,32 @@ const attachBudgetWorker = () => {
   const worker = new Worker(
     "budget-queue",
     async (job: Job) => {
-      //   const { data } = job;
-
       logger.info(`Processing #${job.id}`);
-      //   throw new Error('signalhj')
 
-      const workerResult = { a: 10 };
-      return workerResult;
+      const { name, email, utilisedPercentage, month, year } = job.data as {
+        name: string;
+        email: string;
+        utilisedPercentage: number;
+        month: string;
+        year: number;
+      };
+
+      sendEmail({
+        template: BUDGET_WARNING,
+        data: {
+          name,
+          utilisedPercentage: utilisedPercentage.toFixed(2),
+          month: dayjs(`2026-${month + 1}-01`).format(`MMMM`),
+          year,
+        },
+        recipients: [email],
+      });
     },
     { connection: redisForBullMq, concurrency: cpus().length }
   );
 
-  worker.on("completed", async (job, result) => {
-    const { data } = job;
-
-    logger.info(`Completed #${job.id}`, data, result);
+  worker.on("completed", async (job, _result) => {
+    logger.info(`Completed #${job.id}`);
   });
 
   worker.on("failed", async (job, err) => {

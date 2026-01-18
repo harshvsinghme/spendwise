@@ -18,7 +18,12 @@ export default class BudgetRepository {
     return rows[0];
   }
 
-  async getMyBudget(client: PoolClient, data: { month: number; year: number }) {
+  async getMyBudget(
+    client: PoolClient,
+    data: { month: number; year: number }
+  ): Promise<
+    undefined | { id: number; user_id: number; monthly_limit: number; month: number; year: number }
+  > {
     const { rows } = await client.query(`SELECT * FROM budgets WHERE month = $1 AND year = $2`, [
       data.month,
       data.year,

@@ -22,7 +22,10 @@ export default class UserRepository {
     return rows[0];
   }
 
-  async findById(client: PoolClient, data: { userId: number }) {
+  async findById(
+    client: PoolClient,
+    data: { userId: number }
+  ): Promise<undefined | { id: number; name: string; email: string }> {
     const { rows } = await client.query(`SELECT id, name, email FROM users WHERE id = $1`, [
       data.userId,
     ]);
