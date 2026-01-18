@@ -1,4 +1,4 @@
-export function resetPasswordTemplate(name: string, link: string) {
+export function resetPasswordTemplate(name: unknown, link: unknown) {
   return `
     <h3>Hi ${name},</h3>
     <h2>Reset your password</h2>
