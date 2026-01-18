@@ -1,10 +1,10 @@
 import { Job, Worker } from "bullmq";
+import dayjs from "dayjs";
 import { cpus } from "node:os";
 import { sendEmail } from "../../../email/email.service.js";
 import { BUDGET_WARNING } from "../../../email/templates/budget-warning.js";
 import logger from "../../../logger/logger.js";
 import redisForBullMq from "../redis.js";
-import dayjs from "dayjs";
 
 const attachBudgetWorker = () => {
   logger.info(`Attaching BullMQ consumer to 'budget-queue'...`);
