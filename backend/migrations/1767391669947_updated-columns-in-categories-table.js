@@ -9,12 +9,13 @@ export const shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 export const up = (pgm) => {
-  pgm.addColumn("users", {
-    currency: {
-      type: "varchar(1)",
-      notNull: true,
-      default: "₹",
-    },
+  pgm.alterColumn("categories", "name", {
+    type: "varchar(30)",
+    notNull: true,
+  });
+  pgm.alterColumn("categories", "icon", {
+    type: "varchar(20)",
+    notNull: true,
   });
 };
 
@@ -24,5 +25,12 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
-  pgm.dropColumn("users", "currency");
+  pgm.alterColumn("categories", "name", {
+    type: "varchar(50)",
+    notNull: true,
+  });
+  pgm.alterColumn("categories", "icon", {
+    type: "varchar(1)",
+    notNull: true,
+  });
 };

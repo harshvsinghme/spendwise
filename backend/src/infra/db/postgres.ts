@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { utcTime } from "../../utils/time.js";
 import logger from "../logger/logger.js";
+import { DB } from "./db.js";
 
 const pool = new Pool({
   connectionString: process.env["DATABASE_URL"],
@@ -32,4 +33,6 @@ export async function checkPostgres() {
   }
 }
 
-export default pool;
+const db = new DB(pool);
+
+export default db;

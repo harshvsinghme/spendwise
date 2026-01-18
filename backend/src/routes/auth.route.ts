@@ -1,6 +1,6 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller.js";
-import pool from "../infra/db/postgres.js";
+import db from "../infra/db/postgres.js";
 import redis from "../infra/redis/redis.js";
 import { asyncHandler } from "../middlewares/async-handler.js";
 import validate from "../middlewares/validate.middleware.js";
@@ -18,9 +18,9 @@ import {
 
 const router: Router = Router();
 
-const userRepo = new UserRepository(pool);
-const passwordResetRepo = new PasswordResetRepository(pool);
-const authService = new AuthService(userRepo, passwordResetRepo, redis);
+const userRepo = new UserRepository();
+const passwordResetRepo = new PasswordResetRepository();
+const authService = new AuthService(userRepo, passwordResetRepo, db, redis);
 const authController = new AuthController(authService);
 
 router.post("/signup", validate(signupSchema), asyncHandler(authController.signup));

@@ -1,0 +1,44 @@
+import type { PoolClient } from "pg";
+
+export default class BudgetRepository {
+  constructor() {}
+
+  async createMyBudget(
+    client: PoolClient,
+    data: { monthlyLimit: number; month: number; year: number }
+  ) {
+    const { rows } = await client.query(
+      `
+      INSERT INTO budgets (user_id, monthly_limit, month, year)
+      VALUES (current_setting('app.user_id')::int, $1, $2, $3)
+      RETURNING id, monthly_limit, month, year
+      `,
+      [data.monthlyLimit, data.month, data.year]
+    );
+    return rows[0];
+  }
+
+  async getMyBudget(
+    client: PoolClient,
+    data: { month: number; year: number }
+  ): Promise<
+    undefined | { id: number; user_id: number; monthly_limit: number; month: number; year: number }
+  > {
+    const { rows } = await client.query(`SELECT * FROM budgets WHERE month = $1 AND year = $2`, [
+      data.month,
+      data.year,
+    ]);
+    return rows[0];
+  }
+
+  async updateMyBudget(client: PoolClient, data: { id: number; monthlyLimit: number }) {
+    await client.query(`UPDATE budgets SET monthly_limit = $1 WHERE id = $2`, [
+      data.monthlyLimit,
+      data.id,
+    ]);
+  }
+
+  async deleteMyBudget(client: PoolClient, data: { id: number }) {
+    await client.query(`DELETE FROM budgets WHERE id = $1`, [data.id]);
+  }
+}

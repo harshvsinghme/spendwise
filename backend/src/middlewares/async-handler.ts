@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
+import type { IExtendedRequest } from "../types/common.js";
 
 export const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
+  (fn: (req: Request | IExtendedRequest, res: Response, next: NextFunction) => Promise<unknown>) =>
   (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
