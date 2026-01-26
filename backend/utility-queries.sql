@@ -58,6 +58,7 @@
 -- ALTER ROLE spendwise_app NOSUPERUSER NOBYPASSRLS;
 -- ALTER ROLE spendwise_app SET row_security = on;
 
+-- Run following GRANT query; only after above queries and after pgmigrations
 -- GRANT USAGE, SELECT ON SEQUENCE budgets_id_seq TO spendwise_app;
 
 
