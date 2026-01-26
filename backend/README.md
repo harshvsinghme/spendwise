@@ -35,7 +35,7 @@ services = business rules
 http layer = routes/controllers/middlewares
 
 # Docker Scripts
-docker compose down -v
+docker compose down
 docker compose build --no-cache
 docker compose up
 
