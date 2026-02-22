@@ -5,11 +5,15 @@ validateEnvVars();
 
 const logger = pino({
   level: process.env["LOG_LEVEL"]!,
+  redact: {
+    paths: ["password", "authToken"],
+    remove: true,
+  },
   transport: {
     target: "pino-pretty",
     options: {
       colorize: true,
-      translateTime: "SYS:standard",
+      translateTime: "UTC:yyyy-mm-dd HH:MM:ss.l o",
       ignore: "pid,hostname",
     },
   },
